@@ -139,6 +139,7 @@ function formatDate(dateString) {
 }
 
 function showNotes() {
+    
     let notesHTML = '';
     notesData.forEach((note, index) => {
         let dateObj = new Date(note.createdAt);
