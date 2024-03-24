@@ -7,11 +7,13 @@
     font-family: "Poppins", sans-serif
 }
 
+
 body {
     background-color: rgb(155, 155, 196);
 }
 
 .wrapper{
+    justify-content: center;
     margin: 50px;
     display: grid;
     grid-template-columns: repeat(auto-fill, 360px);
@@ -228,4 +230,52 @@ form .row label {
     color: white;
     font-size: 15px;
     border-radius: 3px;
+}
+
+.head_bar {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.search-box input[type="text"] {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    max-width: 60%;
+    height: 55px;
+}
+.search-box button {
+    display: inline-block;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+    cursor: pointer;
+    width: 50px; 
+    height: 55px;
+}
+
+
+.search-box input[type="text"]:focus {
+    outline-color: #acb4bd;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); /* Tambahkan box-shadow pada input yang sedang dalam fokus */
+}
+
+
+.search-box button:hover {
+    background-color: #4186d0; /* Mengubah warna tombol saat hover */
 }

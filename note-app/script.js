@@ -1,25 +1,64 @@
 const addBox = document.querySelector(".add-box");
-const popupBox = document.querySelector('.popup-box'); // Define popupBox here
-const popupTitle = popupBox.querySelector('header p'); // Define popupBox here
+const popupBox = document.querySelector('.popup-box');
+const popupTitle = popupBox.querySelector('header p');
 const closeIcon = popupBox.querySelector('header i');
 const titleNote = popupBox.querySelector('input');
 const descNote = popupBox.querySelector('textarea');
-const addBtn = popupBox.querySelector('button'); // Gunakan const karena sudah dideklarasikan sebelumnya
+const addBtn = popupBox.querySelector('button');
+const searchInput = document.getElementById('searchInput');
+const searchButton = document.getElementById('searchButton');
 const months = ['January', 'February', 'Maret', 'April', 'May', 'Juni', 'Juli', 'Augustus', 'September', 'October', 'November', 'Desember'];
 
-let notesData = JSON.parse(localStorage.getItem('notes') || "[]");
 
+let notesData = JSON.parse(localStorage.getItem('notes') || "[]");
 let isUpdate = false, updateId;
 
 function generateId() {
     return Math.random().toString(36).substring(2);
 }
 
+function handleSearch() {
+    const searchText = searchInput.value.toLowerCase();
+    const filteredNotes = notesData.filter(note => {
+        return note.title.toLowerCase().includes(searchText) || note.body.toLowerCase().includes(searchText);
+    });
+    displayNotes(filteredNotes);
+}
+
+function displayNotes(notes) {
+    let notesHTML = '';
+    notes.forEach((note, index) => {
+        notesHTML += `
+            <li class="note">
+                <div class="details">
+                    <p>${note.title}</p>
+                    <span>${note.body}</span>
+                </div>
+                <div class="bottom-content">
+                    <span>${note.createdAt}</span>
+                    <div class="settings">
+                        <i onclick="showMenu(this)" class="uil uil-ellipsis-h"></i>
+                        <ul class="menu">
+                            <li onclick="updateNote(${index}, '${note.title}', '${note.body}')">
+                                <i class="uil uil-pen"></i>Edit
+                            </li>
+                            <li onclick="deleteNote(${index})">
+                                <i class="uil uil-trash"></i>Delete
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </li>`;
+    });
+    const addBoxParent = addBox.parentElement;
+    addBoxParent.innerHTML = notesHTML;
+    addBoxParent.insertBefore(addBox, addBoxParent.firstChild);
+}
 
 addBox.addEventListener('click', () => {
     titleNote.focus();
     popupBox.classList.add('show');
-})
+});
 
 closeIcon.addEventListener('click', () => {
     isUpdate= false;
@@ -30,7 +69,23 @@ closeIcon.addEventListener('click', () => {
     popupBox.classList.remove('show');
 });
 
+function saveNotes() {
+    localStorage.setItem('notes', JSON.stringify(notesData));
+}
 
+function loadNotes() {
+    const savedNotes = localStorage.getItem('notes');
+    if (savedNotes) {
+        notesData = JSON.parse(savedNotes);
+    } else {
+        notesData = [];
+    }
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+    loadNotes();
+    displayNotes(notesData);
+});
 
 addBtn.addEventListener('click', handleAddButtonClick);
 
@@ -63,23 +118,31 @@ function handleAddButtonClick(event) {
             notesData[updateId] = noteInfo;
         }
         
-        localStorage.setItem('notes', JSON.stringify(notesData));
+        saveNotes();
         closeIcon.click();
         showNotes();
     }
 }
+
+searchInput.addEventListener('input', handleSearch);
+
 function deleteNote(noteId) {
     notesData.splice(noteId, 1);
     localStorage.setItem('notes', JSON.stringify(notesData));
-    showNotes(); // Perbarui tampilan setelah menghapus catatan
+    showNotes();
+}
+
+function formatDate(dateString) {
+    const options = { month: 'long', day: 'numeric', year: 'numeric' };
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', options).format(date);
 }
 
 function showNotes() {
     let notesHTML = '';
     notesData.forEach((note, index) => {
         let dateObj = new Date(note.createdAt);
-        let formatter = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-        let formattedDate = formatter.format(dateObj);
+        let formattedDate = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
         notesHTML += `
             <li class="note">
                 <div class="details">
@@ -92,7 +155,7 @@ function showNotes() {
                         <i onclick="showMenu(this)" class="uil uil-ellipsis-h"></i>
                         <ul class="menu">
                             <li onclick="updateNote(${index}, '${note.title}', '${note.body}')">
-                                <i  class="uil uil-pen"></i>Edit
+                                <i class="uil uil-pen"></i>Edit
                             </li>
                             <li onclick="deleteNote(${index})">
                                 <i class="uil uil-trash"></i>Delete
@@ -102,10 +165,10 @@ function showNotes() {
                 </div>
             </li>`;
     });
-    // Tambahkan HTML catatan ke dalam addBox
+   
     const addBoxParent = addBox.parentElement;
     addBoxParent.innerHTML = notesHTML;
-    addBoxParent.insertBefore(addBox, addBoxParent.firstChild); // Pastikan addBox tetap menjadi anak pertama
+    addBoxParent.insertBefore(addBox, addBoxParent.firstChild);
 }
 
 showNotes();
@@ -117,13 +180,13 @@ window.showMenu = function(elem) {
             elem.parentElement.classList.remove('show');
         }
     });
-}
+};
 
 window.deleteNote = function(noteId) {
     notesData.splice(noteId, 1);
     localStorage.setItem('notes', JSON.stringify(notesData));
-    showNotes(); // Perbarui tampilan setelah menghapus catatan
-}
+    showNotes();
+};
 
 window.updateNote= function(noteId, noteTitle, noteDesc){
     isUpdate = true;
@@ -133,7 +196,4 @@ window.updateNote= function(noteId, noteTitle, noteDesc){
     descNote.value = noteDesc;
     addBtn.innerText = 'Update Note';
     popupTitle.innerText = 'Update your Note';
-    console.log(noteId, noteTitle, noteDesc);
-}
-
-
+};
