@@ -68,12 +68,10 @@ function handleAddButtonClick(event) {
         showNotes();
     }
 }
-
-
-
-
 function deleteNote(noteId) {
-    console.log(noteId);
+    notesData.splice(noteId, 1);
+    localStorage.setItem('notes', JSON.stringify(notesData));
+    showNotes(); // Perbarui tampilan setelah menghapus catatan
 }
 
 function showNotes() {
@@ -97,19 +95,19 @@ function showNotes() {
                                 <i  class="uil uil-pen"></i>Edit
                             </li>
                             <li onclick="deleteNote(${index})">
-    <i class="uil uil-trash"></i>Delete
-</li>
-
+                                <i class="uil uil-trash"></i>Delete
+                            </li>
                         </ul>
                     </div>
                 </div>
             </li>`;
     });
-    addBox.insertAdjacentHTML('afterend', notesHTML);
-
-   
-    
+    // Tambahkan HTML catatan ke dalam addBox
+    const addBoxParent = addBox.parentElement;
+    addBoxParent.innerHTML = notesHTML;
+    addBoxParent.insertBefore(addBox, addBoxParent.firstChild); // Pastikan addBox tetap menjadi anak pertama
 }
+
 showNotes();
 
 window.showMenu = function(elem) {
@@ -124,13 +122,8 @@ window.showMenu = function(elem) {
 window.deleteNote = function(noteId) {
     notesData.splice(noteId, 1);
     localStorage.setItem('notes', JSON.stringify(notesData));
-    // Hapus elemen HTML dari DOM
-    const noteElement = document.querySelectorAll('.note')[noteId];
-    if (noteElement) {
-        noteElement.remove();
-    }
+    showNotes(); // Perbarui tampilan setelah menghapus catatan
 }
-
 
 window.updateNote= function(noteId, noteTitle, noteDesc){
     isUpdate = true;
@@ -142,6 +135,5 @@ window.updateNote= function(noteId, noteTitle, noteDesc){
     popupTitle.innerText = 'Update your Note';
     console.log(noteId, noteTitle, noteDesc);
 }
-
 
 
